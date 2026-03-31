@@ -1,0 +1,63 @@
+{
+  "entity_to_code": {
+    "color.primary": {
+      "generated": [
+        "lib/ui/theme/design_tokens.g.dart"
+      ],
+      "manual": [
+        "lib/ui/theme/app_theme.dart"
+      ],
+      "entry_points": []
+    },
+    "button/base": {
+      "generated": [
+        "lib/ui/components/buttons/button_primitives.g.dart"
+      ],
+      "manual": [
+        "lib/ui/components/buttons/app_button.dart"
+      ],
+      "entry_points": [
+        "lib/features/checkout/presentation/widgets/checkout_header.dart"
+      ]
+    },
+    "checkout/header": {
+      "generated": [
+        "lib/features/checkout/presentation/widgets/checkout_header_layout.g.dart"
+      ],
+      "manual": [
+        "lib/features/checkout/presentation/widgets/checkout_header.dart"
+      ],
+      "entry_points": []
+    }
+  },
+  "entity_to_tests": {
+    "button/base": {
+      "golden": [
+        "components/button/base"
+      ],
+      "widget": [
+        "test/ui/components/buttons/app_button_test.dart"
+      ],
+      "integration": []
+    },
+    "checkout/header": {
+      "golden": [
+        "screens/checkout/header"
+      ],
+      "widget": [
+        "test/features/checkout/widgets/checkout_header_test.dart"
+      ],
+      "integration": []
+    }
+  },
+  "component_usage": {
+    "button/base": [
+      "checkout/header"
+    ]
+  },
+  "token_usage": {
+    "color.primary": [
+      "button/base"
+    ]
+  }
+}
