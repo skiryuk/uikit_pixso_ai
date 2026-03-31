@@ -20,6 +20,10 @@ design:fetch_diff:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
   before_script:
     - python3 --version
+    - test -n "${PIXSO_TOKEN:-}" || (echo "ERROR: PIXSO_TOKEN is not set" && exit 1)
+    - test -n "${PIXSO_FILE:-}" || (echo "ERROR: PIXSO_FILE is not set" && exit 1)
+    - echo "PIXSO_TOKEN is set (masked)"
+    - echo "PIXSO_FILE is set (masked)"
     - mkdir -p build/design-sync
   script:
     - python3 tool/design_fetch_diff.py
