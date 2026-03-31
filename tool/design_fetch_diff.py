@@ -78,34 +78,49 @@ def fetch_snapshot(token: str, file_id: str) -> Dict[str, Any]:
         except json.JSONDecodeError:
             fail("Локальный snapshot содержит невалидный JSON.")
 
-    template = os.getenv(
-        "PIXSO_SNAPSHOT_URL_TEMPLATE",
-        "https://api.pixso.com/v1/files/{file_id}/snapshot",
-    )
-    url = template.format(file_id=file_id)
-
-    req = Request(
-        url,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json",
-        },
-        method="GET",
+    templates: List[str] = []
+    explicit = os.getenv("PIXSO_SNAPSHOT_URL_TEMPLATE")
+    if explicit:
+        templates.append(explicit)
+    # Дефолт для Pixso OpenAPI + резервный старый хост.
+    templates.extend(
+        [
+            "https://openapi.pixso.net/v1/files/{file_id}/snapshot",
+            "https://api.pixso.com/v1/files/{file_id}/snapshot",
+        ]
     )
 
-    try:
-        with urlopen(req, timeout=30) as resp:
-            payload = resp.read().decode("utf-8")
-            data = json.loads(payload)
-            if not isinstance(data, dict):
-                fail("Pixso API вернул некорректный JSON-объект.")
-            return data
-    except HTTPError as e:
-        fail(f"Pixso API HTTP {e.code}: {e.reason}")
-    except URLError as e:
-        fail(f"Pixso API недоступен: {e.reason}")
-    except json.JSONDecodeError:
-        fail("Pixso API вернул невалидный JSON.")
+    errors: List[str] = []
+    for template in templates:
+        url = template.format(file_id=file_id)
+        req = Request(
+            url,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/json",
+            },
+            method="GET",
+        )
+        try:
+            with urlopen(req, timeout=30) as resp:
+                payload = resp.read().decode("utf-8")
+                data = json.loads(payload)
+                if not isinstance(data, dict):
+                    fail("Pixso API вернул некорректный JSON-объект.")
+                return data
+        except HTTPError as e:
+            # Для 401/403/404 нет смысла пробовать другие base URL.
+            fail(f"Pixso API HTTP {e.code}: {e.reason}. URL: {url}")
+        except URLError as e:
+            errors.append(f"{url} -> {e.reason}")
+        except json.JSONDecodeError:
+            fail(f"Pixso API вернул невалидный JSON. URL: {url}")
+
+    fail(
+        "Pixso API недоступен по всем endpoint-шаблонам. "
+        "Проверь DNS/egress runner-а или задай PIXSO_SNAPSHOT_URL_TEMPLATE. "
+        f"Детали: {'; '.join(errors)}"
+    )
 
 
 def diff_dict(

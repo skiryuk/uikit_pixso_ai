@@ -12,7 +12,7 @@ design:fetch_diff:
   variables:
     # Обязательные CI variables: PIXSO_TOKEN и PIXSO_FILE.
     # Опционально можно переопределить endpoint шаблон.
-    PIXSO_SNAPSHOT_URL_TEMPLATE: "https://api.pixso.com/v1/files/{file_id}/snapshot"
+    PIXSO_SNAPSHOT_URL_TEMPLATE: "https://openapi.pixso.net/v1/files/{file_id}/snapshot"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -23,6 +23,11 @@ design:fetch_diff:
     - mkdir -p build/design-sync
   script:
     - python3 tool/design_fetch_diff.py
+  after_script:
+    - mkdir -p build/design-sync
+    - test -f build/design-sync/design_snapshot_new.json || echo '{}' > build/design-sync/design_snapshot_new.json
+    - test -f build/design-sync/design_diff.json || echo '{}' > build/design-sync/design_diff.json
+    - test -f build/design-sync/impact_report.json || echo '{}' > build/design-sync/impact_report.json
   artifacts:
     when: always
     expire_in: 7 days
