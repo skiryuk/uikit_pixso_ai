@@ -12,7 +12,7 @@ design:fetch_diff:
   variables:
     # Обязательные CI variables: PIXSO_TOKEN и PIXSO_FILE.
     # Опционально можно переопределить endpoint шаблон.
-    PIXSO_SNAPSHOT_URL_TEMPLATE: "https://openapi.pixso.net/v1/files/{file_id}/snapshot"
+    PIXSO_SNAPSHOT_URL_TEMPLATE: "https://pixso.net/api/v1/files/{file_id}/snapshot"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'

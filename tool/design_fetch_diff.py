@@ -82,9 +82,10 @@ def fetch_snapshot(token: str, file_id: str) -> Dict[str, Any]:
     explicit = os.getenv("PIXSO_SNAPSHOT_URL_TEMPLATE")
     if explicit:
         templates.append(explicit)
-    # Дефолт для Pixso OpenAPI + резервный старый хост.
+    # Приоритет: явный endpoint из CI variable, затем кандидаты.
     templates.extend(
         [
+            "https://pixso.net/api/v1/files/{file_id}/snapshot",
             "https://openapi.pixso.net/v1/files/{file_id}/snapshot",
             "https://api.pixso.com/v1/files/{file_id}/snapshot",
         ]
